@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "945871075403",
+    "firebase_url": "https://emedibot-9fd58-default-rtdb.firebaseio.com",
+    "project_id": "emedibot-9fd58",
+    "storage_bucket": "emedibot-9fd58.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945871075403:android:5b6cbd09dbc01cb9ab35ce",
+        "android_client_info": {
+          "package_name": "com.example.emedibotsimpleuserlogin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNvseIKEOihZPybuiNuGtS7AqFJKNccgM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

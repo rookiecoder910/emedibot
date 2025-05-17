@@ -31,7 +31,7 @@ fun MainScreenWithBottomNav(
             startDestination = Screen.Main.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            // Home Screen
+
             composable(Screen.Main.Home.route) {
                 HomeScreen(onSignOut = {
                     // Handle sign-out and navigate back to login screen
@@ -42,12 +42,13 @@ fun MainScreenWithBottomNav(
                 })
             }
 
-            // Schedule Screen: Pass medicines list to ScheduleScreen
-            composable(Screen.Main.Schedule.route) {
-                ScheduleScreen(medicines = medicines)
+
+            composable("schedule") {
+                ScheduleScreen() // ViewModel will be provided automatically by Compose
             }
 
-            // Settings Screen
+
+
             composable(Screen.Main.Settings.route) {
                 SettingsScreen(
                     isDarkMode = isDarkMode,

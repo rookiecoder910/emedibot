@@ -26,10 +26,12 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import androidx.core.net.toUri
 
+
 data class Medicine(val name: String, var time: String)
 @SuppressLint("NewApi")
 @Composable
 fun HomeScreen(onSignOut: () -> Unit) {
+
     val context = LocalContext.current
 
     // ✅ Declare medicines state at the top
@@ -37,7 +39,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
         mutableStateOf(emptyList<Medicine>())
     }
 
-    // ✅ Fetch from Firebase and update the `medicines` state directly
+
     LaunchedEffect(Unit) {
         val database = Firebase.database
         val ref = database.getReference("medicines")
@@ -59,13 +61,13 @@ fun HomeScreen(onSignOut: () -> Unit) {
         })
     }
 
-    // ... rest of your existing code
+
 
 
 
     val nextMedicine = medicines.firstOrNull()
 
-    // New state for user input
+
     var newMedicineName by remember { mutableStateOf("") }
     var newMedicineTime by remember { mutableStateOf("") }
     var showTimePicker by remember { mutableStateOf(false) }

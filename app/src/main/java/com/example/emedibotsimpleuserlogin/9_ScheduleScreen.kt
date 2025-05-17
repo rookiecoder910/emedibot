@@ -14,20 +14,20 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.delay
 
 @Composable
-fun ScheduleScreen(medicines: List<Medicine>) {
+fun ScheduleScreen(viewModel: ScheduleViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+    val medicines by viewModel.medicines.collectAsState()
     var isRefreshing by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
 
-    // Trigger refresh effect when isRefreshing becomes true
+    // Simulate refresh (can be enhanced later to re-fetch or manually refresh Firebase)
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
-            delay(1500) // Simulate network or database delay
+            delay(1000)
             isRefreshing = false
         }
     }
 
     if (isError) {
-        // Error State - Retry button
         ErrorState(onRetry = {
             isError = false
             isRefreshing = true
@@ -38,10 +38,8 @@ fun ScheduleScreen(medicines: List<Medicine>) {
             onRefresh = { isRefreshing = true }
         ) {
             if (medicines.isEmpty()) {
-                // Empty State - No Medicines
                 EmptyState()
             } else {
-                // Show the list of medicines in a LazyColumn
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(medicines) { medicine ->
                         MedicineItem(medicine)

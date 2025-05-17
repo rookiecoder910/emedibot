@@ -6,11 +6,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
-
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDarkMode: Boolean,
+    onToggleDarkMode: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -28,8 +29,18 @@ fun AppNavGraph(
         }
 
         composable(Screen.Main.route) {
-            MainScreenWithBottomNav()
-          }
+            MainScreenWithBottomNav(
+                isDarkMode = isDarkMode,
+                onToggleDarkMode = onToggleDarkMode,
+                onLogout = {
+                    // Ensure proper back stack clearing when logging out
+                    navController.navigate(Screen.Login.route) {
+                        // Clear back stack and navigate to Login screen
+                        popUpTo(Screen.Main.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
+    }
 }
-

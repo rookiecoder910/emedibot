@@ -9,8 +9,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun MainScreenWithBottomNav() {
+fun MainScreenWithBottomNav(
+    isDarkMode: Boolean,
+    onToggleDarkMode: () -> Unit,
+    onLogout: () -> Unit
+) {
     val navController = rememberNavController()
+    val medicines = listOf(
+        Medicine("Tablet A", "8:00 AM"),
+        Medicine("Tablet B", "12:00 PM"),
+        Medicine("Tablet C", "6:00 PM")
+    )
 
     Scaffold(
         bottomBar = {
@@ -25,23 +34,26 @@ fun MainScreenWithBottomNav() {
             // Home Screen
             composable(Screen.Main.Home.route) {
                 HomeScreen(onSignOut = {
-                    // Handle sign out here (e.g., navigate back to login)
+                    // Handle sign-out and navigate back to login screen
+                    onLogout()
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Main.route) { inclusive = true }
                     }
                 })
             }
 
-
+            // Schedule Screen: Pass medicines list to ScheduleScreen
             composable(Screen.Main.Schedule.route) {
-                ScheduleScreen()
+                ScheduleScreen(medicines = medicines)
             }
 
-
+            // Settings Screen
             composable(Screen.Main.Settings.route) {
                 SettingsScreen(
+                    isDarkMode = isDarkMode,
+                    onToggleDarkMode = onToggleDarkMode,
                     onLogout = {
-
+                        onLogout()
                         navController.navigate(Screen.Login.route) {
                             popUpTo(Screen.Main.route) { inclusive = true }
                         }

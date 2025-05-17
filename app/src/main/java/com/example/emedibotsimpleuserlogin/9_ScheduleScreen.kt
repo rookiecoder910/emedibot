@@ -1,28 +1,96 @@
 package com.example.emedibotsimpleuserlogin
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.delay
 
 @Composable
-fun ScheduleScreen() {
-    val medications = remember {
-        listOf(
-            "Aspirin - 08:00 AM",
-            "Vitamin D - 12:00 PM",
-            "Ibuprofen - 06:00 PM"
-        )
+fun ScheduleScreen(medicines: List<Medicine>) {
+    var isRefreshing by remember { mutableStateOf(false) }
+    var isError by remember { mutableStateOf(false) }
+
+    // Trigger refresh effect when isRefreshing becomes true
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing) {
+            delay(1500) // Simulate network or database delay
+            isRefreshing = false
+        }
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(medications) { med ->
-            Text(med, modifier = Modifier.padding(16.dp))
+    if (isError) {
+        // Error State - Retry button
+        ErrorState(onRetry = {
+            isError = false
+            isRefreshing = true
+        })
+    } else {
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(isRefreshing),
+            onRefresh = { isRefreshing = true }
+        ) {
+            if (medicines.isEmpty()) {
+                // Empty State - No Medicines
+                EmptyState()
+            } else {
+                // Show the list of medicines in a LazyColumn
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(medicines) { medicine ->
+                        MedicineItem(medicine)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MedicineItem(medicine: Medicine) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = medicine.name, style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = "Time: ${medicine.time}", style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+@Composable
+fun EmptyState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("No Medicines Scheduled", style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+fun ErrorState(onRetry: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Failed to load medicines", style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onRetry) {
+                Text("Retry")
+            }
         }
     }
 }

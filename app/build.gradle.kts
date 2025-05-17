@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.gms.google.services) // Google Services plugin
 }
 
 android {
@@ -46,7 +47,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // Compose setup
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.ui)
@@ -54,8 +55,14 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    // Optional: If using Compose Navigation
+    // Navigation
     implementation(libs.androidx.navigation.compose)
+
+    // Firebase Realtime Database
+    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
+
+    // Accompanist SwipeRefresh - compatible with Compose BOM 2024.09.00
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.34.0")
 
     // Testing
     testImplementation(libs.junit)

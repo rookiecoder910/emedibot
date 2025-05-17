@@ -24,26 +24,68 @@ import com.google.firebase.ktx.Firebase
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import androidx.core.net.toUri
 
 data class Medicine(val name: String, var time: String)
-
 @SuppressLint("NewApi")
 @Composable
 fun HomeScreen(onSignOut: () -> Unit) {
     val context = LocalContext.current
 
+    // ✅ Declare medicines state at the top
     var medicines by remember {
-        mutableStateOf(
-            listOf(
-                Medicine("Tablet A", "8:00 AM"),
-                Medicine("Tablet B", "12:00 PM"),
-                Medicine("Tablet C", "6:00 PM"),
-                Medicine("Tablet D", "10:00 AM")
-            )
-        )
+        mutableStateOf(emptyList<Medicine>())
     }
 
+    // ✅ Fetch from Firebase and update the `medicines` state directly
+    LaunchedEffect(Unit) {
+        val database = Firebase.database
+        val ref = database.getReference("medicines")
+
+        ref.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                val medicineList = mutableListOf<Medicine>()
+                for (child in snapshot.children) {
+                    val name = child.key?.replace("_", " ") ?: continue
+                    val time = child.getValue(String::class.java) ?: continue
+                    medicineList.add(Medicine(name, time))
+                }
+                medicines = medicineList.sortedBy { it.time }  // ✅ update state properly
+            }
+
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                Toast.makeText(context, "Failed to load medicines: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    // ... rest of your existing code
+
+
+
     val nextMedicine = medicines.firstOrNull()
+
+    // New state for user input
+    var newMedicineName by remember { mutableStateOf("") }
+    var newMedicineTime by remember { mutableStateOf("") }
+    var showTimePicker by remember { mutableStateOf(false) }
+
+    if (showTimePicker) {
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+
+        TimePickerDialog(
+            context,
+            { _, selectedHour, selectedMinute ->
+                newMedicineTime = formatTime(selectedHour, selectedMinute)
+                showTimePicker = false
+            },
+            hour,
+            minute,
+            false
+        ).show()
+    }
 
     Box(
         modifier = Modifier
@@ -93,7 +135,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
 
             Button(
                 onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.pharmeasy.in"))
+                    val intent = Intent(Intent.ACTION_VIEW, "https://www.pharmeasy.in".toUri())
                     context.startActivity(intent)
                 },
                 modifier = Modifier
@@ -103,6 +145,51 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 Text("Order New Medicines", fontSize = 16.sp)
             }
 
+            // 🔽 New Section: Add Medicine
+            Text(
+                text = "Add New Medicine",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(top = 24.dp)
+            )
+
+            OutlinedTextField(
+                value = newMedicineName,
+                onValueChange = { newMedicineName = it },
+                label = { Text("Medicine Name") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Selected Time: ${if (newMedicineTime.isBlank()) "None" else newMedicineTime}")
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = { showTimePicker = true }) {
+                    Text("Set Time")
+                }
+            }
+
+            Button(
+                onClick = {
+                    if (newMedicineName.isNotBlank() && newMedicineTime.isNotBlank()) {
+                        val updated = medicines + Medicine(newMedicineName.trim(), newMedicineTime)
+                        medicines = updated
+                        updateFirebaseMedicineTime(updated)
+
+                        newMedicineName = ""
+                        newMedicineTime = ""
+                    } else {
+                        Toast.makeText(context, "Please enter name and time", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Add Medicine")
+            }
+
+            // 🔽 Existing Schedule Section
             Text(
                 text = "Today's Schedule",
                 style = MaterialTheme.typography.titleLarge,
@@ -116,7 +203,6 @@ fun HomeScreen(onSignOut: () -> Unit) {
                         val updated = medicines.toMutableList()
                         updated[index] = updated[index].copy(time = newTime)
                         medicines = updated
-
                         updateFirebaseMedicineTime(updated)
                     }
                 }
@@ -195,9 +281,10 @@ fun updateFirebaseMedicineTime(medicines: List<Medicine>) {
 
     medicines.forEach { medicine ->
         val medicineRef = ref.child(medicine.name.replace(" ", "_"))
-        medicineRef.setValue(medicine.time)
+        medicineRef.setValue(medicine.time) // This writes to Firebase!
     }
 }
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -252,6 +339,7 @@ fun formatTime(hour: Int, minute: Int): String {
     val time = LocalTime.of(hour, minute)
     return time.format(formatter)
 }
+
 
 @Composable
 fun PreviewHomeScreen() {

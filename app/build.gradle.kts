@@ -54,15 +54,25 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
 
     // Firebase Realtime Database
     implementation("com.google.firebase:firebase-database-ktx:21.0.0")
+// Firebase Auth
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+
+// Google Sign-In (for Firebase)
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     // Accompanist SwipeRefresh - compatible with Compose BOM 2024.09.00
     implementation("com.google.accompanist:accompanist-swiperefresh:0.34.0")
+    implementation(libs.material)
+
+
 
     // Testing
     testImplementation(libs.junit)

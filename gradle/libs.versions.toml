@@ -10,9 +10,17 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 navigationCompose = "2.7.7"
 googleGmsGoogleServices = "4.4.2"
-firebaseDatabase = "21.0.0"              # Optional but often used with Compose
+firebaseDatabase = "21.0.0"
+material = "1.12.0"
+playServicesAds = "24.3.0"
+playServicesMaps = "19.2.0"              # Optional but often used with Compose
+firebaseAuth = "22.3.0"
+playServicesAuth = "20.7.0"
 
 [libraries]
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -29,6 +37,9 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

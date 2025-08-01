@@ -3,47 +3,62 @@ package com.example.emedibotsimpleuserlogin
 import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.*
-import androidx.core.net.toUri
-
+import java.util.Calendar
 
 data class Medicine(val name: String, var time: String)
+
 @SuppressLint("NewApi")
 @Composable
 fun HomeScreen(onSignOut: () -> Unit) {
-
     val context = LocalContext.current
-
-    // ✅ Declare medicines state at the top
-    var medicines by remember {
-        mutableStateOf(emptyList<Medicine>())
-    }
-
+    var medicines by remember { mutableStateOf(emptyList<Medicine>()) }
 
     LaunchedEffect(Unit) {
-        val database = Firebase.database
-        val ref = database.getReference("medicines")
-
+        val ref = Firebase.database.getReference("medicines")
         ref.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
                 val medicineList = mutableListOf<Medicine>()
@@ -52,7 +67,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
                     val time = child.getValue(String::class.java) ?: continue
                     medicineList.add(Medicine(name, time))
                 }
-                medicines = medicineList.sortedBy { it.time }  // ✅ update state properly
+                medicines = medicineList.sortedBy { it.time }
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
@@ -61,30 +76,21 @@ fun HomeScreen(onSignOut: () -> Unit) {
         })
     }
 
-
-
-
-
     val nextMedicine = medicines.firstOrNull()
-
-
     var newMedicineName by remember { mutableStateOf("") }
     var newMedicineTime by remember { mutableStateOf("") }
     var showTimePicker by remember { mutableStateOf(false) }
 
     if (showTimePicker) {
         val calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
-
         TimePickerDialog(
             context,
-            { _, selectedHour, selectedMinute ->
-                newMedicineTime = formatTime(selectedHour, selectedMinute)
+            { _, hour, minute ->
+                newMedicineTime = formatTime(hour, minute)
                 showTimePicker = false
             },
-            hour,
-            minute,
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
             false
         ).show()
     }
@@ -93,40 +99,49 @@ fun HomeScreen(onSignOut: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-    ) {
+    ) {Image(
+        painter = painterResource(id = R.drawable.home_bg),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
+
+        val scrollState = rememberScrollState()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 24.dp),
+                .verticalScroll(scrollState)
+                .padding(horizontal = 20.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
             Text(
-                text = "Welcome to E-medibot",
+                " E-Medibot ",
                 style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 16.dp)
+                fontFamily = MaterialTheme.typography.headlineLarge.fontFamily
+
+
             )
 
             nextMedicine?.let {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.large
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(20.dp)) {
                         Text("Upcoming Dose", style = MaterialTheme.typography.titleLarge)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(it.name, fontSize = 20.sp)
-                        Text("Time: ${it.time}", fontSize = 16.sp)
+                        Text("\uD83D\uDCCC ${it.name}", fontSize = 20.sp)
+                        Text("\uD83D\uDD52 Time: ${it.time}", fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(12.dp))
                         Button(onClick = {
                             Toast.makeText(context, "Viewing Instructions for ${it.name}...", Toast.LENGTH_SHORT).show()
-                        }) {
+                        }, modifier = Modifier.align(Alignment.End)) {
                             Text("View Instructions")
                         }
                     }
@@ -140,25 +155,21 @@ fun HomeScreen(onSignOut: () -> Unit) {
                     val intent = Intent(Intent.ACTION_VIEW, "https://www.pharmeasy.in".toUri())
                     context.startActivity(intent)
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
-                Text("Order New Medicines", fontSize = 16.sp)
+                Text("\uD83D\uDED2 Order New Medicines", fontSize = 16.sp)
             }
 
-            // 🔽 New Section: Add Medicine
-            Text(
-                text = "Add New Medicine",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(top = 24.dp)
-            )
+            Text("➕ Add New Medicine", style = MaterialTheme.typography.titleLarge)
 
             OutlinedTextField(
                 value = newMedicineName,
                 onValueChange = { newMedicineName = it },
                 label = { Text("Medicine Name") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                singleLine = true
             )
 
             Row(
@@ -166,8 +177,8 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Selected Time: ${if (newMedicineTime.isBlank()) "None" else newMedicineTime}")
-                Spacer(modifier = Modifier.width(8.dp))
+                Text("\uD83D\uDD52 Time: ${if (newMedicineTime.isBlank()) "Not Set" else newMedicineTime}")
+                Spacer(Modifier.width(8.dp))
                 Button(onClick = { showTimePicker = true }) {
                     Text("Set Time")
                 }
@@ -179,7 +190,6 @@ fun HomeScreen(onSignOut: () -> Unit) {
                         val updated = medicines + Medicine(newMedicineName.trim(), newMedicineTime)
                         medicines = updated
                         updateFirebaseMedicineTime(updated)
-
                         newMedicineName = ""
                         newMedicineTime = ""
                     } else {
@@ -188,39 +198,52 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Add Medicine")
+                Text("\uD83D\uDCBE Add Medicine")
             }
 
-            // 🔽 Existing Schedule Section
-            Text(
-                text = "Today's Schedule",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+            Text("\uD83D\uDCC5 Today's Schedule", style = MaterialTheme.typography.titleLarge)
 
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 medicines.forEachIndexed { index, medicine ->
-                    MedicineScheduleItem(medicine) { newTime ->
-                        val updated = medicines.toMutableList()
-                        updated[index] = updated[index].copy(time = newTime)
-                        medicines = updated
-                        updateFirebaseMedicineTime(updated)
-                    }
+                    MedicineScheduleItem(
+                        medicine = medicine,
+                        onTimeChange = { newTime ->
+                            val updated = medicines.toMutableList()
+                            updated[index] = updated[index].copy(time = newTime)
+                            medicines = updated
+                            updateFirebaseMedicineTime(updated)
+                        },
+                        onDelete = {
+                            deleteMedicine(medicine, medicines) { updatedList ->
+                                medicines = updatedList
+                            }
+                        }
+                    )
                 }
             }
 
             Button(
-                onClick = {
-                    onSignOut()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
+                onClick = onSignOut,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
             ) {
-                Text("Sign Out", fontSize = 16.sp)
+                Text("\uD83D\uDEAA Sign Out", fontSize = 16.sp, color = MaterialTheme.colorScheme.onErrorContainer)
             }
         }
+    }
+}
+
+fun deleteMedicine(
+    medicine: Medicine,
+    medicines: List<Medicine>,
+    updateMedicines: (List<Medicine>) -> Unit
+) {
+    val database = Firebase.database
+    val ref = database.getReference("medicines").child(medicine.name.replace(" ", "_"))
+
+    ref.removeValue().addOnSuccessListener {
+        val updatedList = medicines.filter { it.name != medicine.name }
+        updateMedicines(updatedList)
     }
 }
 
@@ -253,7 +276,7 @@ fun DeviceStatusCard() {
         statusRef.child("battery").addValueEventListener(object : com.google.firebase.database.ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
                 val battery = snapshot.getValue(String::class.java)
-                batteryLevel = battery?.let { "🔋 $battery%" } ?: "N/A"
+                batteryLevel = battery?.let { "\uD83D\uDD0B $battery%" } ?: "N/A"
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
@@ -283,14 +306,13 @@ fun updateFirebaseMedicineTime(medicines: List<Medicine>) {
 
     medicines.forEach { medicine ->
         val medicineRef = ref.child(medicine.name.replace(" ", "_"))
-        medicineRef.setValue(medicine.time) // This writes to Firebase!
+        medicineRef.setValue(medicine.time)
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit) {
+fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onDelete: () -> Unit) {
     var showTimePicker by remember { mutableStateOf(false) }
     var newTime by remember { mutableStateOf(medicine.time) }
 
@@ -298,21 +320,17 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit) {
 
     if (showTimePicker) {
         val calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
-
         TimePickerDialog(
             context,
-            { _, selectedHour, selectedMinute ->
-                val formattedTime = formatTime(selectedHour, selectedMinute)
+            { _, hour, minute ->
+                val formattedTime = formatTime(hour, minute)
                 newTime = formattedTime
                 onTimeChange(formattedTime)
             },
-            hour,
-            minute,
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
             false
         ).show()
-
         showTimePicker = false
     }
 
@@ -325,11 +343,23 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit) {
             Text(text = medicine.name, style = MaterialTheme.typography.titleSmall)
             Text(text = "Time: $newTime", style = MaterialTheme.typography.bodySmall)
 
-            Button(
-                onClick = { showTimePicker = true },
-                modifier = Modifier.padding(top = 8.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Set Time", fontSize = 14.sp)
+                Button(
+                    onClick = { showTimePicker = true },
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Text("Set Time", fontSize = 14.sp)
+                }
+
+                OutlinedButton(
+                    onClick = onDelete,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Text("Delete", fontSize = 14.sp, color = MaterialTheme.colorScheme.error)
+                }
             }
         }
     }
@@ -341,7 +371,6 @@ fun formatTime(hour: Int, minute: Int): String {
     val time = LocalTime.of(hour, minute)
     return time.format(formatter)
 }
-
 
 @Composable
 fun PreviewHomeScreen() {

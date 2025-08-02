@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     private val _state = MutableStateFlow(AuthState())
     val state: StateFlow<AuthState> = _state.asStateFlow()
+    fun setLoading(isLoading: Boolean) { _state.value = _state.value.copy(isLoading = isLoading) }
+    fun setError(message: String) { _state.value = _state.value.copy(errorMessage = message) }
 
     fun login(username: String, password: String) {
         if (username.isBlank() || password.isBlank()) {

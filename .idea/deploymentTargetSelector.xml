@@ -7,10 +7,10 @@
       </SelectionState>
       <SelectionState runConfigName="emedibots.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-31T12:24:25.209910700Z">
+        <DropdownSelection timestamp="2025-08-02T20:16:38.146032200Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\manas\.android\avd\Medium_Phone.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=3974e49a" />
             </handle>
           </Target>
         </DropdownSelection>

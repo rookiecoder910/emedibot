@@ -1,11 +1,13 @@
 package com.example.emedibotsimpleuserlogin
 
+import android.R.attr.fontWeight
 import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -96,7 +98,7 @@ fun LoginScreen(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
             Image(
                 painter = painterResource(id = R.drawable.bg),
@@ -124,6 +126,7 @@ fun LoginScreen(
 
                 Text(
                     text = "eMediBot",
+
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 28.sp
@@ -133,6 +136,7 @@ fun LoginScreen(
 
                 Text(
                     text = "Your Personal Medication Reminder",
+
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Medium
                     ),

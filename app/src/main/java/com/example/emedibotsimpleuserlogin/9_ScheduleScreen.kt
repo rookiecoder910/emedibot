@@ -1,3 +1,4 @@
+//this file is for the schedule screen
 package com.example.emedibotsimpleuserlogin
 
 import androidx.compose.foundation.layout.*

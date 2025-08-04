@@ -3,6 +3,7 @@ package com.example.emedibotsimpleuserlogin
 import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.fonts.Font
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -25,6 +26,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -36,9 +39,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -98,9 +104,9 @@ fun HomeScreen(onSignOut: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(colorScheme.background)
     ) {Image(
-        painter = painterResource(id = R.drawable.home_bg),
+        painter = painterResource(id = R.drawable.homescr_bg),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxSize()
@@ -116,33 +122,25 @@ fun HomeScreen(onSignOut: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Text(
-                " E-Medibot ",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-                fontFamily = MaterialTheme.typography.headlineLarge.fontFamily
 
-
-            )
 
             nextMedicine?.let {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F7F9) ),
                     shape = MaterialTheme.shapes.large
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
-                        Text("Upcoming Dose", style = MaterialTheme.typography.titleLarge)
+                        Text("Upcoming Dose", style = typography.titleLarge)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("\uD83D\uDCCC ${it.name}", fontSize = 20.sp)
-                        Text("\uD83D\uDD52 Time: ${it.time}", fontSize = 16.sp)
+                        Text(" ${it.name}", fontSize = 20.sp)
+                        Text(" Time: ${it.time}", fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(12.dp))
                         Button(onClick = {
                             Toast.makeText(context, "Viewing Instructions for ${it.name}...", Toast.LENGTH_SHORT).show()
                         }, modifier = Modifier.align(Alignment.End)) {
-                            Text("View Instructions")
+                            Text("View Instructions", fontFamily = FontFamily.SansSerif)
                         }
                     }
                 }
@@ -156,12 +154,12 @@ fun HomeScreen(onSignOut: () -> Unit) {
                     context.startActivity(intent)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.secondary)
             ) {
-                Text("\uD83D\uDED2 Order New Medicines", fontSize = 16.sp)
+                Text("Order New Medicines", fontSize = 16.sp)
             }
 
-            Text("➕ Add New Medicine", style = MaterialTheme.typography.titleLarge)
+            Text(" Add New Medicine", color = colorScheme.primary, fontWeight = FontWeight.ExtraBold)
 
             OutlinedTextField(
                 value = newMedicineName,
@@ -198,10 +196,10 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("\uD83D\uDCBE Add Medicine")
+                Text("Add Medicine")
             }
 
-            Text("\uD83D\uDCC5 Today's Schedule", style = MaterialTheme.typography.titleLarge)
+            Text("Today's Schedule", style = typography.titleLarge)
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 medicines.forEachIndexed { index, medicine ->
@@ -222,12 +220,13 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 }
             }
 
+
             Button(
                 onClick = onSignOut,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.errorContainer)
             ) {
-                Text("\uD83D\uDEAA Sign Out", fontSize = 16.sp, color = MaterialTheme.colorScheme.onErrorContainer)
+                Text("Sign Out", fontSize = 16.sp, color = colorScheme.onErrorContainer)
             }
         }
     }
@@ -288,11 +287,11 @@ fun DeviceStatusCard() {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F7F9) ),
         shape = MaterialTheme.shapes.medium
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Device Status", style = MaterialTheme.typography.titleMedium)
+            Text("Device Status", style = typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
             Text("Dispenser: $dispenserStatus")
             Text("Battery Level: $batteryLevel")
@@ -340,8 +339,8 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onD
         shape = MaterialTheme.shapes.medium
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = medicine.name, style = MaterialTheme.typography.titleSmall)
-            Text(text = "Time: $newTime", style = MaterialTheme.typography.bodySmall)
+            Text(text = medicine.name, style = typography.titleSmall)
+            Text(text = "Time: $newTime", style = typography.bodySmall)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -358,7 +357,7 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onD
                     onClick = onDelete,
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
-                    Text("Delete", fontSize = 14.sp, color = MaterialTheme.colorScheme.error)
+                    Text("Delete", fontSize = 14.sp, color =colorScheme.error)
                 }
             }
         }
@@ -372,7 +371,3 @@ fun formatTime(hour: Int, minute: Int): String {
     return time.format(formatter)
 }
 
-@Composable
-fun PreviewHomeScreen() {
-    HomeScreen(onSignOut = {})
-}

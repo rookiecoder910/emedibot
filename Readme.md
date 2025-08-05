@@ -22,7 +22,10 @@ eMediBot is a Kotlin-based Android app designed to help users manage and track t
 
 ## 🖼️ Screenshots
 
-> (Add 2 screenshots showing reminder screen and form screen)
+<img width="1152" height="2597" alt="homescreen" src="https://github.com/user-attachments/assets/bb5697d4-5b0c-4bf2-ba35-15951c925b5f" />
+
+<img width="1152" height="2597" alt="login" src="https://github.com/user-attachments/assets/a912da91-3a34-48d4-8674-0530c0a8ec20" />
+<img width="1152" height="2597" alt="schedulescreen" src="https://github.com/user-attachments/assets/f77b500b-1098-497e-bbda-d5e966e04ab4" />
 
 ---
 

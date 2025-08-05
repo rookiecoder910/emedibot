@@ -12,6 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.delay
@@ -73,7 +78,7 @@ fun ScheduleScreen(viewModel: ScheduleViewModel = androidx.lifecycle.viewmodel.c
 
 @Composable
 fun MedicineItem(medicine: Medicine) {
-    Card(
+    ElevatedCard (
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         shape = RoundedCornerShape(16.dp),
@@ -102,12 +107,30 @@ fun EmptyState() {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("🗓️ No Medicines Scheduled", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
+            LottieAnimation(
+                resId = R.raw.empty_calender, // Use a calming/clean calendar animation
+                modifier = Modifier.size(200.dp)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text("No Medicines Scheduled", style = MaterialTheme.typography.titleMedium)
             Text("You're all caught up for today!", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
+
+
+@Composable
+fun LottieAnimation(resId: Int, modifier: Modifier = Modifier) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(resId))
+    val progress by animateLottieCompositionAsState(composition, iterations = LottieConstants.IterateForever)
+
+    LottieAnimation(
+        composition,
+        progress,
+        modifier = modifier
+    )
+}
+
 
 @Composable
 fun ErrorState(onRetry: () -> Unit) {

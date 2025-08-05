@@ -253,13 +253,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 }
             }
 
-            ElevatedButton(
-                onClick = onSignOut,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.errorContainer)
-            ) {
-                Text("Sign Out", fontSize = 16.sp, color = colorScheme.onErrorContainer)
-            }
+          
         }
     }
 }

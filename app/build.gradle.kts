@@ -77,6 +77,7 @@ dependencies {
 
 // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.airbnb.android:lottie-compose:6.1.0")
 
 
     // Testing

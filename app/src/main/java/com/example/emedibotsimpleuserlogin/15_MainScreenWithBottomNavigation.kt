@@ -53,11 +53,10 @@ fun MainScreenWithBottomNav(
                 SettingsScreen(
                     isDarkMode = isDarkMode,
                     onToggleDarkMode = onToggleDarkMode,
-                    onLogout = {
+                    onLogoutDone = {
                         onLogout()
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Main.route) { inclusive = true }
-                        }
+
+
                     }
                 )
             }

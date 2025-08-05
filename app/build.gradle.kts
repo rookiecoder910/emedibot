@@ -72,6 +72,11 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:0.34.0")
     implementation(libs.material)
 
+// Coil for Jetpack Compose
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
+// Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
 
     // Testing

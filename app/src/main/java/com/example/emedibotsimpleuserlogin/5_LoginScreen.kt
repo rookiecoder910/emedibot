@@ -184,7 +184,7 @@ fun LoginScreen(
                     textDecoration = TextDecoration.Underline
                 )
 
-                Button(
+                FilledTonalButton (
                     onClick = {
                         viewModel.login(username, password)
                     },
@@ -207,7 +207,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Button(
+               FilledTonalButton (
                     onClick = {
                         viewModel.setLoading(true)
                         val signInIntent: Intent = googleSignInClient.signInIntent

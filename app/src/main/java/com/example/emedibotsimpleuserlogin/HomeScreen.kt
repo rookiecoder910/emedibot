@@ -20,15 +20,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -49,13 +54,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import com.google.firebase.database.ValueEventListener
+
+import com.google.firebase.database.DatabaseError
 
 data class Medicine(val name: String, var time: String)
+
+
 
 @SuppressLint("NewApi")
 @Composable
@@ -65,8 +76,8 @@ fun HomeScreen(onSignOut: () -> Unit) {
 
     LaunchedEffect(Unit) {
         val ref = Firebase.database.getReference("medicines")
-        ref.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
-            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
                 val medicineList = mutableListOf<Medicine>()
                 for (child in snapshot.children) {
                     val name = child.key?.replace("_", " ") ?: continue
@@ -76,7 +87,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 medicines = medicineList.sortedBy { it.time }
             }
 
-            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+            override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(context, "Failed to load medicines: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
@@ -105,12 +116,13 @@ fun HomeScreen(onSignOut: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(colorScheme.background)
-    ) {Image(
-        painter = painterResource(id = R.drawable.homescr_bg),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxSize()
-    )
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.homescr_bg),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
 
         val scrollState = rememberScrollState()
 
@@ -118,29 +130,44 @@ fun HomeScreen(onSignOut: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
 
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Image(
+                    painter = painterResource(id = R.drawable.emedibot),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .width(48.dp)
+                        .height(48.dp)
+                )
+                Text("Hi, User!", style = typography.titleMedium, modifier = Modifier.align(Alignment.CenterVertically))
+            }
 
             nextMedicine?.let {
-                Card(
+                ElevatedCard(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F7F9) ),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
                     shape = MaterialTheme.shapes.large
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text("Upcoming Dose", style = typography.titleLarge)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(" ${it.name}", fontSize = 20.sp)
-                        Text(" Time: ${it.time}", fontSize = 16.sp)
+                        Text("${it.name}", fontSize = 20.sp)
+                        Text("Time: ${it.time}", fontSize = 16.sp, color = Color.DarkGray)
                         Spacer(modifier = Modifier.height(12.dp))
-                        Button(onClick = {
-                            Toast.makeText(context, "Viewing Instructions for ${it.name}...", Toast.LENGTH_SHORT).show()
-                        }, modifier = Modifier.align(Alignment.End)) {
-                            Text("View Instructions", fontFamily = FontFamily.SansSerif)
+                        ElevatedButton(
+                            onClick = {
+                                Toast.makeText(context, "Viewing Instructions for ${it.name}...", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Text("Instructions")
                         }
                     }
                 }
@@ -148,55 +175,61 @@ fun HomeScreen(onSignOut: () -> Unit) {
 
             DeviceStatusCard()
 
-            Button(
+            OutlinedButton(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW, "https://www.pharmeasy.in".toUri())
                     context.startActivity(intent)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.secondary)
+                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.secondaryContainer)
             ) {
                 Text("Order New Medicines", fontSize = 16.sp)
             }
 
-            Text(" Add New Medicine", color = colorScheme.primary, fontWeight = FontWeight.ExtraBold)
-
-            OutlinedTextField(
-                value = newMedicineName,
-                onValueChange = { newMedicineName = it },
-                label = { Text("Medicine Name") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.medium,
-                singleLine = true
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+            // Medicine Add Section
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White, shape = MaterialTheme.shapes.medium)
+                    .padding(16.dp)
             ) {
-                Text("\uD83D\uDD52 Time: ${if (newMedicineTime.isBlank()) "Not Set" else newMedicineTime}")
-                Spacer(Modifier.width(8.dp))
-                Button(onClick = { showTimePicker = true }) {
-                    Text("Set Time")
-                }
-            }
+                Text("Add New Medicine", style = typography.titleMedium, color = colorScheme.primary)
+                OutlinedTextField(
+                    value = newMedicineName,
+                    onValueChange = { newMedicineName = it },
+                    label = { Text("Medicine Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    singleLine = true
+                )
 
-            Button(
-                onClick = {
-                    if (newMedicineName.isNotBlank() && newMedicineTime.isNotBlank()) {
-                        val updated = medicines + Medicine(newMedicineName.trim(), newMedicineTime)
-                        medicines = updated
-                        updateFirebaseMedicineTime(updated)
-                        newMedicineName = ""
-                        newMedicineTime = ""
-                    } else {
-                        Toast.makeText(context, "Please enter name and time", Toast.LENGTH_SHORT).show()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Time: ${if (newMedicineTime.isBlank()) "Not Set" else newMedicineTime}")
+                    Button(onClick = { showTimePicker = true }) {
+                        Text("Set Time")
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Add Medicine")
+                }
+
+                ElevatedButton(
+                    onClick = {
+                        if (newMedicineName.isNotBlank() && newMedicineTime.isNotBlank()) {
+                            val updated = medicines + Medicine(newMedicineName.trim(), newMedicineTime)
+                            medicines = updated
+                            updateFirebaseMedicineTime(updated)
+                            newMedicineName = ""
+                            newMedicineTime = ""
+                        } else {
+                            Toast.makeText(context, "Please enter name and time", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Add Medicine")
+                }
             }
 
             Text("Today's Schedule", style = typography.titleLarge)
@@ -220,8 +253,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 }
             }
 
-
-            Button(
+            ElevatedButton(
                 onClick = onSignOut,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = colorScheme.errorContainer)
@@ -285,7 +317,7 @@ fun DeviceStatusCard() {
         })
     }
 
-    Card(
+    ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F7F9) ),
         shape = MaterialTheme.shapes.medium
@@ -333,7 +365,7 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onD
         showTimePicker = false
     }
 
-    Card(
+    ElevatedCard  (
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         shape = MaterialTheme.shapes.medium
@@ -346,7 +378,7 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onD
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(
+                OutlinedButton (
                     onClick = { showTimePicker = true },
                     modifier = Modifier.padding(top = 8.dp)
                 ) {

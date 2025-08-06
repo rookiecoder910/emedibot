@@ -1,4 +1,5 @@
 package com.example.emedibotsimpleuserlogin
+import com.example.emedibotsimpleuserlogin.showNotification
 
 import android.annotation.SuppressLint
 import android.app.TimePickerDialog
@@ -7,8 +8,10 @@ import android.graphics.fonts.Font
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,7 +48,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -63,6 +70,7 @@ import java.util.Calendar
 import com.google.firebase.database.ValueEventListener
 
 import com.google.firebase.database.DatabaseError
+import java.util.Collections.frequency
 
 data class Medicine(val name: String, var time: String)
 
@@ -94,6 +102,17 @@ fun HomeScreen(onSignOut: () -> Unit) {
     }
 
     val nextMedicine = medicines.firstOrNull()
+    LaunchedEffect(nextMedicine) {
+        nextMedicine?.let {
+            showNotification(
+
+                context,
+
+                "",
+                "${it.name} at ${it.time}"
+            )
+        }
+    }
     var newMedicineName by remember { mutableStateOf("") }
     var newMedicineTime by remember { mutableStateOf("") }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -121,7 +140,8 @@ fun HomeScreen(onSignOut: () -> Unit) {
             painter = painterResource(id = R.drawable.homescr_bg),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.1f), blendMode = BlendMode.Darken)
         )
 
         val scrollState = rememberScrollState()
@@ -149,51 +169,81 @@ fun HomeScreen(onSignOut: () -> Unit) {
             }
 
             nextMedicine?.let {
+                var isUpcomingExpanded by remember { mutableStateOf(true) }
+
                 ElevatedCard(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                    colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceVariant),
                     shape = MaterialTheme.shapes.large
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Text("Upcoming Dose", style = typography.titleLarge)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("${it.name}", fontSize = 20.sp)
-                        Text("Time: ${it.time}", fontSize = 16.sp, color = Color.DarkGray)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        ElevatedButton(
-                            onClick = {
-                                Toast.makeText(context, "Viewing Instructions for ${it.name}...", Toast.LENGTH_SHORT).show()
-                            },
-                            modifier = Modifier.align(Alignment.End)
+                    Column(modifier = Modifier.padding(16.dp)) {
+
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { isUpcomingExpanded = !isUpcomingExpanded },
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Instructions")
+                            Text("Upcoming Dose", style = typography.titleLarge)
+
+                            val icon = if (isUpcomingExpanded) R.drawable.ic_arrow_up else R.drawable.ic_arrow_down
+                            Image(
+                                painter = painterResource(id = icon),
+                                contentDescription = "Toggle Upcoming Dose",
+                                modifier = Modifier
+                                    .width(24.dp)
+                                    .height(24.dp)
+                            )
+                        }
+
+                        AnimatedVisibility(visible = isUpcomingExpanded) {
+                            Column {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text("${it.name}", fontSize = 20.sp)
+                                Text("Time: ${it.time}", fontSize = 16.sp, color = Color.DarkGray)
+                                Spacer(modifier = Modifier.height(12.dp))
+                                ElevatedButton(
+                                    onClick = {
+                                        Toast.makeText(context, "Viewing Instructions for ${it.name}...", Toast.LENGTH_SHORT).show()
+                                    },
+                                    modifier = Modifier.align(Alignment.End)
+                                ) {
+                                    Text("Instructions")
+                                }
+                            }
                         }
                     }
                 }
             }
 
+
             DeviceStatusCard()
 
-            OutlinedButton(
+            ElevatedButton(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW, "https://www.pharmeasy.in".toUri())
                     context.startActivity(intent)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.secondaryContainer)
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = Red,
+                    contentColor = Black
+                )
             ) {
                 Text("Order New Medicines", fontSize = 16.sp)
             }
 
-            // Medicine Add Section
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White, shape = MaterialTheme.shapes.medium)
                     .padding(16.dp)
             ) {
-                Text("Add New Medicine", style = typography.titleMedium, color = colorScheme.primary)
+                Text("Add New Medicine", style = typography.titleMedium, color = colorScheme.onSurface)
                 OutlinedTextField(
                     value = newMedicineName,
                     onValueChange = { newMedicineName = it },
@@ -208,7 +258,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Time: ${if (newMedicineTime.isBlank()) "Not Set" else newMedicineTime}")
+                    Text("Time: ${if (newMedicineTime.isBlank()) "Not Set" else newMedicineTime}",)
                     Button(onClick = { showTimePicker = true }) {
                         Text("Set Time")
                     }
@@ -232,7 +282,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 }
             }
 
-            Text("Today's Schedule", style = typography.titleLarge)
+            Text("Today's Schedule", style = typography.titleLarge, color = Black)
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 medicines.forEachIndexed { index, medicine ->
@@ -280,11 +330,15 @@ fun DeviceStatusCard() {
     var dispenserStatus by remember { mutableStateOf("Not connected") }
     var batteryLevel by remember { mutableStateOf("N/A") }
 
+
+    var isExpanded by remember { mutableStateOf(false) }
+
+
     LaunchedEffect(Unit) {
         val statusRef = database.getReference("device_status")
 
-        statusRef.child("dispenser").addValueEventListener(object : com.google.firebase.database.ValueEventListener {
-            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+        statusRef.child("dispenser").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
                 val status = snapshot.getValue(String::class.java)
                 dispenserStatus = when (status) {
                     "connected" -> "✅ Connected"
@@ -292,35 +346,58 @@ fun DeviceStatusCard() {
                 }
             }
 
-            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+            override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(context, "Failed to load dispenser status", Toast.LENGTH_SHORT).show()
-                dispenserStatus = "❌ Not connected"
             }
         })
 
-        statusRef.child("battery").addValueEventListener(object : com.google.firebase.database.ValueEventListener {
-            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+        statusRef.child("battery").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
                 val battery = snapshot.getValue(String::class.java)
                 batteryLevel = battery?.let { "\uD83D\uDD0B $battery%" } ?: "N/A"
             }
 
-            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+            override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(context, "Failed to load battery level", Toast.LENGTH_SHORT).show()
-                batteryLevel = "N/A"
             }
         })
     }
 
+
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F7F9) ),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceVariant),
         shape = MaterialTheme.shapes.medium
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Device Status", style = typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Dispenser: $dispenserStatus")
-            Text("Battery Level: $batteryLevel")
+            // Header row with toggle icon
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Device Status", style = typography.titleMedium)
+
+
+                val icon = if (isExpanded) R.drawable.ic_arrow_up else R.drawable.ic_arrow_down
+                Image(
+                    painter = painterResource(id = icon),
+                    contentDescription = "Toggle",
+                    modifier = Modifier
+                        .width(24.dp)
+                        .height(24.dp)
+                        .clickable { isExpanded = !isExpanded }
+                )
+            }
+
+
+            AnimatedVisibility(visible = isExpanded) {
+                Column {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Dispenser: $dispenserStatus")
+                    Text("Battery Level: $batteryLevel")
+                }
+            }
         }
     }
 }

@@ -1,12 +1,10 @@
 //this file is for the reminder screen and notification
 //handles the notifications
 package com.example.emedibotsimpleuserlogin
-import android.Manifest
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 

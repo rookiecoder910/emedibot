@@ -64,7 +64,7 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         SettingToggle(
-            label = "Dark Mode",
+            label = "Dark Mode (experimental)",
             isChecked = isDarkMode,
             onCheckedChange = onToggleDarkMode
         )

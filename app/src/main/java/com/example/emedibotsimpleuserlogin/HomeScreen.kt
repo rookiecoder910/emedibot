@@ -34,6 +34,7 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
@@ -48,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
@@ -70,6 +72,7 @@ import java.util.Calendar
 import com.google.firebase.database.ValueEventListener
 
 import com.google.firebase.database.DatabaseError
+import scheduleDailyAlarm
 import java.util.Collections.frequency
 
 data class Medicine(val name: String, var time: String)
@@ -102,17 +105,8 @@ fun HomeScreen(onSignOut: () -> Unit) {
     }
 
     val nextMedicine = medicines.firstOrNull()
-    LaunchedEffect(nextMedicine) {
-        nextMedicine?.let {
-            showNotification(
 
-                context,
 
-                "",
-                "${it.name} at ${it.time}"
-            )
-        }
-    }
     var newMedicineName by remember { mutableStateOf("") }
     var newMedicineTime by remember { mutableStateOf("") }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -203,7 +197,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
                             Column {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text("${it.name}", fontSize = 20.sp)
-                                Text("Time: ${it.time}", fontSize = 16.sp, color = Color.DarkGray)
+                                Text("Time: ${it.time}", fontSize = 16.sp)
                                 Spacer(modifier = Modifier.height(12.dp))
                                 ElevatedButton(
                                     onClick = {
@@ -236,53 +230,94 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 Text("Order New Medicines", fontSize = 16.sp)
             }
 
-
-            Column(
+            ElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White, shape = MaterialTheme.shapes.medium)
-                    .padding(16.dp)
+                    .background(Color.Black, shape = shapes.medium),
+                shape = shapes.medium
             ) {
-                Text("Add New Medicine", style = typography.titleMedium, color = colorScheme.onSurface)
-                OutlinedTextField(
-                    value = newMedicineName,
-                    onValueChange = { newMedicineName = it },
-                    label = { Text("Medicine Name") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium,
-                    singleLine = true
-                )
+                Column(modifier = Modifier.padding(16.dp)) {
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Time: ${if (newMedicineTime.isBlank()) "Not Set" else newMedicineTime}",)
-                    Button(onClick = { showTimePicker = true }) {
-                        Text("Set Time")
-                    }
-                }
+                    Text(
+                        text = "Add New Medicine",
+                        style = typography.titleMedium,
+                        color = colorScheme.onSurface
+                    )
 
-                ElevatedButton(
-                    onClick = {
-                        if (newMedicineName.isNotBlank() && newMedicineTime.isNotBlank()) {
-                            val updated = medicines + Medicine(newMedicineName.trim(), newMedicineTime)
-                            medicines = updated
-                            updateFirebaseMedicineTime(updated)
-                            newMedicineName = ""
-                            newMedicineTime = ""
-                        } else {
-                            Toast.makeText(context, "Please enter name and time", Toast.LENGTH_SHORT).show()
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = newMedicineName,
+                        onValueChange = { newMedicineName = it },
+                        label = { Text("Medicine Name") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = shapes.medium,
+                        singleLine = true
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Time: ${if (newMedicineTime.isBlank()) "Not Set" else newMedicineTime}",
+                            color = colorScheme.onSurface
+                        )
+                        Button(onClick = { showTimePicker = true }) {
+                            Text("Set Time")
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Add Medicine")
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedButton(
+                        onClick = {
+                            if (newMedicineName.isNotBlank() && newMedicineTime.isNotBlank()) {
+                                val updated = medicines + Medicine(newMedicineName.trim(), newMedicineTime)
+                                medicines = updated
+                                updateFirebaseMedicineTime(updated)
+                                val timeParts = newMedicineTime.split(":", " ")
+                                if (timeParts.size >= 3) {
+                                    var hour = timeParts[0].toInt()
+                                    val minute = timeParts[1].toInt()
+                                    val amPm = timeParts[2]
+
+                                    if (amPm.equals("PM", ignoreCase = true) && hour != 12) hour += 12
+                                    if (amPm.equals("AM", ignoreCase = true) && hour == 12) hour = 0
+
+                                    scheduleDailyAlarm(context, hour, minute, newMedicineName.trim())
+                                }
+
+                                newMedicineName = ""
+                                newMedicineTime = ""
+                            } else {
+                                Toast.makeText(context, "Please enter name and time", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Add Medicine")
+                    }
                 }
             }
 
-            Text("Today's Schedule", style = typography.titleLarge, color = Black)
+
+            Text(
+                text = "Today's Schedule",
+                style = typography.headlineSmall.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.Black
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp)
+                .shadow(12.dp, spotColor = Color.Cyan),
+
+                textAlign = TextAlign.Center
+            )
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 medicines.forEachIndexed { index, medicine ->
@@ -438,8 +473,8 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onD
 
     ElevatedCard  (
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        shape = MaterialTheme.shapes.medium
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceVariant),
+        shape = shapes.medium
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = medicine.name, style = typography.titleSmall)

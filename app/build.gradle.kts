@@ -77,8 +77,9 @@ dependencies {
 
 // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+    //lotte animation and data store
     implementation("com.airbnb.android:lottie-compose:6.1.0")
-
+    implementation ("androidx.datastore:datastore-preferences:1.1.1")
 
     // Testing
     testImplementation(libs.junit)

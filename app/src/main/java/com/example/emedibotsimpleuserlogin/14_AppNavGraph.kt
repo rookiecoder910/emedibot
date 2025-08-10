@@ -33,9 +33,9 @@ fun AppNavGraph(
                 isDarkMode = isDarkMode,
                 onToggleDarkMode = onToggleDarkMode,
                 onLogout = {
-                    // Ensure proper back stack clearing when logging out
+
                     navController.navigate(Screen.Login.route) {
-                        // Clear back stack and navigate to Login screen
+
                         popUpTo(Screen.Main.route) { inclusive = true }
                         launchSingleTop = true
                     }

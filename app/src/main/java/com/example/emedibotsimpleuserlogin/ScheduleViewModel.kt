@@ -1,27 +1,29 @@
 package com.example.emedibotsimpleuserlogin
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class ScheduleViewModel : ViewModel() {
 
     private val _medicines = MutableStateFlow<List<Medicine>>(emptyList())
     val medicines: StateFlow<List<Medicine>> = _medicines
 
-    private val databaseRef: DatabaseReference = Firebase.database.getReference("medicines")
+    // Reference to the logged-in user's medicines
+    private val databaseRef: DatabaseReference? = Firebase.auth.currentUser?.uid?.let { uid ->
+        Firebase.database.getReference("users").child(uid).child("medicines")
+    }
 
     init {
         observeMedicineChanges()
     }
 
     private fun observeMedicineChanges() {
-        databaseRef.addValueEventListener(object : ValueEventListener {
+        databaseRef?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val medicineList = mutableListOf<Medicine>()
                 for (child in snapshot.children) {
@@ -33,7 +35,7 @@ class ScheduleViewModel : ViewModel() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // You might want to set an error state here
+                // Log or handle error
             }
         })
     }

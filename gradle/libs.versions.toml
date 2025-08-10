@@ -1,7 +1,7 @@
 [versions]
 agp = "8.9.0"
 kotlin = "2.0.21"
-coreKtx = "1.15.0"                        # Changed to latest stable
+coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -13,7 +13,7 @@ googleGmsGoogleServices = "4.4.2"
 firebaseDatabase = "21.0.0"
 material = "1.12.0"
 playServicesAds = "24.3.0"
-playServicesMaps = "19.2.0"              # Optional but often used with Compose
+playServicesMaps = "19.2.0"
 firebaseAuth = "22.3.0"
 playServicesAuth = "20.7.0"
 

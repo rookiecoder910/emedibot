@@ -63,6 +63,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -86,7 +87,9 @@ fun HomeScreen(onSignOut: () -> Unit) {
     var medicines by remember { mutableStateOf(emptyList<Medicine>()) }
 
     LaunchedEffect(Unit) {
-        val ref = Firebase.database.getReference("medicines")
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@LaunchedEffect
+        val ref = Firebase.database.getReference("users").child(uid).child("medicines")
+
         ref.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val medicineList = mutableListOf<Medicine>()
@@ -103,6 +106,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
             }
         })
     }
+
 
     val nextMedicine = medicines.firstOrNull()
 
@@ -130,13 +134,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.homescr_bg),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-            colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.1f), blendMode = BlendMode.Darken)
-        )
+
 
         val scrollState = rememberScrollState()
 
@@ -338,7 +336,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 }
             }
 
-          
+
         }
     }
 }
@@ -348,14 +346,15 @@ fun deleteMedicine(
     medicines: List<Medicine>,
     updateMedicines: (List<Medicine>) -> Unit
 ) {
-    val database = Firebase.database
-    val ref = database.getReference("medicines").child(medicine.name.replace(" ", "_"))
+    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    val ref = Firebase.database.getReference("users").child(uid).child("medicines").child(medicine.name.replace(" ", "_"))
 
     ref.removeValue().addOnSuccessListener {
         val updatedList = medicines.filter { it.name != medicine.name }
         updateMedicines(updatedList)
     }
 }
+
 
 @Composable
 fun DeviceStatusCard() {
@@ -382,7 +381,7 @@ fun DeviceStatusCard() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Failed to load dispenser status", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "Failed to load dispenser status", Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -393,7 +392,7 @@ fun DeviceStatusCard() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Failed to load battery level", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "Failed to load battery level", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -438,14 +437,15 @@ fun DeviceStatusCard() {
 }
 
 fun updateFirebaseMedicineTime(medicines: List<Medicine>) {
-    val database = Firebase.database
-    val ref = database.getReference("medicines")
+    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    val ref = Firebase.database.getReference("users").child(uid).child("medicines")
 
     medicines.forEach { medicine ->
         val medicineRef = ref.child(medicine.name.replace(" ", "_"))
         medicineRef.setValue(medicine.time)
     }
 }
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

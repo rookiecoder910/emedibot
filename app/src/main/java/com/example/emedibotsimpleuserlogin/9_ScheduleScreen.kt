@@ -108,7 +108,7 @@ fun EmptyState() {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             LottieAnimation(
-                resId = R.raw.empty_calender, // Use a calming/clean calendar animation
+                resId = R.raw.empty_calender,
                 modifier = Modifier.size(200.dp)
             )
             Spacer(modifier = Modifier.height(12.dp))

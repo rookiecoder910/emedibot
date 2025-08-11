@@ -39,7 +39,7 @@ fun ScheduleScreen(viewModel: ScheduleViewModel = androidx.lifecycle.viewmodel.c
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("📅 Today's Schedule", fontSize = 22.sp, fontWeight = FontWeight.Bold) }
+                title = { Text(" Today's Schedule", fontSize = 22.sp, fontWeight = FontWeight.Bold) }
             )
         }
     ) { padding ->

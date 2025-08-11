@@ -56,7 +56,14 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.firebase.auth)
     implementation(libs.play.services.auth)
-
+    //okhttp+gson
+    implementation ("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation ("com.google.code.gson:gson:2.11.0")
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    //voice command
+    implementation ("androidx.activity:activity-compose:1.7.2")
     // Navigation
     implementation(libs.androidx.navigation.compose)
 
@@ -75,8 +82,9 @@ dependencies {
 // Coil for Jetpack Compose
     implementation("io.coil-kt:coil-compose:2.4.0")
 
-// Google Sign-In
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+
+
     //lotte animation and data store
     implementation("com.airbnb.android:lottie-compose:6.1.0")
     implementation ("androidx.datastore:datastore-preferences:1.1.1")

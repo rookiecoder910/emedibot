@@ -23,7 +23,7 @@ fun IntroScreen(onFinish: () -> Unit, onSkip: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFDFDFE)) // Soft off-white background
+            .background(Color(0xFFFDFDFE))
     ) {
         Column(
             modifier = Modifier

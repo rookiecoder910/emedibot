@@ -1,16 +1,17 @@
 package com.example.emedibotsimpleuserlogin
-import com.example.emedibotsimpleuserlogin.showNotification
+
 
 import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.graphics.fonts.Font
+
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,23 +22,37 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialogDefaults.containerColor
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
+
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedCard
+
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,14 +65,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.BlendMode
+
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Color.Companion.White
+
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
+
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -74,11 +90,51 @@ import com.google.firebase.database.ValueEventListener
 
 import com.google.firebase.database.DatabaseError
 import scheduleDailyAlarm
-import java.util.Collections.frequency
+
 
 data class Medicine(val name: String, var time: String)
+@Composable
+fun dropdown(){
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    Box(modifier=Modifier.padding(1.dp),contentAlignment = Alignment.TopEnd){
+        IconButton(
+            onClick = {expanded=!expanded}
+        ) {
+            Icon(Icons.Default.Menu, contentDescription = "Menu")
+        }
+        DropdownMenu(
+            expanded = expanded,
 
+            onDismissRequest = { expanded=false }) {
+            DropdownMenuItem(text = { Text("Profile") },
+                trailingIcon ={Icon(Icons.Outlined.Person, contentDescription = "profile")},
+                onClick = { }
 
+            )
+            HorizontalDivider()
+            DropdownMenuItem(text = { Text("Settings") },
+                trailingIcon ={Icon(Icons.Outlined.Settings, contentDescription = "profile")},
+                onClick = { }
+
+            )
+            HorizontalDivider()
+            DropdownMenuItem(text = { Text("Notifications") },
+                trailingIcon ={Icon(Icons.Outlined.Notifications, contentDescription = "profile")},
+                onClick = { }
+
+            )
+            HorizontalDivider()
+            DropdownMenuItem(text = { Text("About us") },
+                trailingIcon ={Icon(Icons.Outlined.Info, contentDescription = "profile")},
+                onClick = { }
+
+            )
+
+        }
+    }
+}
 
 @SuppressLint("NewApi")
 @Composable
@@ -102,7 +158,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Failed to load medicines: ${error.message}", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "Failed to load medicines: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -147,18 +203,40 @@ fun HomeScreen(onSignOut: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
                 Image(
                     painter = painterResource(id = R.drawable.emedibot),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .clip(CircleShape)
-                        .width(48.dp)
-                        .height(48.dp)
+                        .size(48.dp)
                 )
-                Text("Hi, User!", style = typography.titleMedium, modifier = Modifier.align(Alignment.CenterVertically))
+
+
+                Row(
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 0.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "",
+                        style = typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    dropdown()
+                }
             }
+
 
             nextMedicine?.let {
                 var isUpcomingExpanded by remember { mutableStateOf(true) }
@@ -312,7 +390,7 @@ fun HomeScreen(onSignOut: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 12.dp)
-                .shadow(12.dp, spotColor = Color.Cyan),
+                    .shadow(12.dp, spotColor = Color.Cyan),
 
                 textAlign = TextAlign.Center
             )
@@ -338,6 +416,35 @@ fun HomeScreen(onSignOut: () -> Unit) {
 
 
         }
+
+
+                FloatingActionButton(
+                    onClick = {Toast.makeText(context, "Gemini Button clicked!", Toast.LENGTH_SHORT).show()},
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(16.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color.Gray.copy(alpha = 2f),
+                            shape = CircleShape
+                        ),
+                    shape = CircleShape,
+                    containerColor = Black.copy(alpha = 0.1f),
+                    elevation = FloatingActionButtonDefaults.elevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp,
+                        focusedElevation = 0.dp,
+                        hoveredElevation = 0.dp
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.gemii),
+                        contentDescription = "Gemini Chat",
+                        tint = Color.Unspecified,
+                                modifier = Modifier.size(32.dp)
+                    )
+                }
+
     }
 }
 
@@ -401,7 +508,7 @@ fun DeviceStatusCard() {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceVariant),
-        shape = MaterialTheme.shapes.medium
+        shape =shapes.medium
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Header row with toggle icon
@@ -499,7 +606,9 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onD
                 }
             }
         }
+
     }
+
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

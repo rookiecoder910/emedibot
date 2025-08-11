@@ -245,7 +245,7 @@ fun LoginScreen(
                 }
             }
 
-            // ✅ Fullscreen loading indicator
+
             if (state.isLoading) {
                 Box(
                     modifier = Modifier
@@ -254,6 +254,7 @@ fun LoginScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = Color.White)
+
                 }
             }
         }

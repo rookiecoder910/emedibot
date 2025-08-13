@@ -79,6 +79,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.ktx.database
@@ -138,7 +139,7 @@ fun dropdown(){
 
 @SuppressLint("NewApi")
 @Composable
-fun HomeScreen(onSignOut: () -> Unit) {
+fun HomeScreen(onSignOut: () -> Unit,navController: NavHostController) {
     val context = LocalContext.current
     var medicines by remember { mutableStateOf(emptyList<Medicine>()) }
 
@@ -417,33 +418,32 @@ fun HomeScreen(onSignOut: () -> Unit) {
 
         }
 
-
-                FloatingActionButton(
-                    onClick = {Toast.makeText(context, "Gemini Button clicked!", Toast.LENGTH_SHORT).show()},
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(16.dp)
-                        .border(
-                            width = 1.dp,
-                            color = Color.Gray.copy(alpha = 2f),
-                            shape = CircleShape
-                        ),
-                    shape = CircleShape,
-                    containerColor = Black.copy(alpha = 0.1f),
-                    elevation = FloatingActionButtonDefaults.elevation(
-                        defaultElevation = 0.dp,
-                        pressedElevation = 0.dp,
-                        focusedElevation = 0.dp,
-                        hoveredElevation = 0.dp
-                    )
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.gemii),
-                        contentDescription = "Gemini Chat",
-                        tint = Color.Unspecified,
-                                modifier = Modifier.size(32.dp)
-                    )
-                }
+        FloatingActionButton(
+            onClick = { navController.navigate("chatbot") },
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+                .border(
+                    width = 1.dp,
+                    color = Color.Gray.copy(alpha = 0.2f),
+                    shape = CircleShape
+                ),
+            shape = CircleShape,
+            containerColor = Black.copy(alpha = 0.1f),
+            elevation = FloatingActionButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                focusedElevation = 0.dp,
+                hoveredElevation = 0.dp
+            )
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.gemii),
+                contentDescription = "Gemini Chat",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(32.dp)
+            )
+        }
 
     }
 }

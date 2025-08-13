@@ -1,5 +1,6 @@
 package com.example.emedibotsimpleuserlogin
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.emedibotsimpleuserlogin.datamodel.GeminiRequest
 import com.example.emedibotsimpleuserlogin.datamodel.GeminiResponse
 
@@ -26,7 +27,7 @@ class datamodel {
 
     data class GeminiRequest(
         val model: String,
-        val messages: List<Message>
+        val messages: SnapshotStateList<VoiceViewModel.Message>
     )
 
     data class Choice(

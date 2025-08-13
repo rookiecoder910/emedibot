@@ -21,7 +21,8 @@
 ## 🖼️ Screenshots
 
 ### 🏠 Home Screen
-<img src="https://github.com/user-attachments/assets/bb5697d4-5b0c-4bf2-ba35-15951c925b5f" width="300" />
+<img width="326" height="693" alt="home-light" src="https://github.com/user-attachments/assets/81bb9c77-99b3-49b2-9703-5b2191c27db5" />
+
 
 ### 🔐 Login Screen
 <img src="https://github.com/user-attachments/assets/a912da91-3a34-48d4-8674-0530c0a8ec20" width="300" />

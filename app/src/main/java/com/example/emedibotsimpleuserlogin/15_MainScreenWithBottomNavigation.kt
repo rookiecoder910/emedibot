@@ -31,34 +31,33 @@ fun MainScreenWithBottomNav(
             startDestination = Screen.Main.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-
             composable(Screen.Main.Home.route) {
-                HomeScreen(onSignOut = {
-                    // Handle sign-out and navigate back to login screen
-                    onLogout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Main.route) { inclusive = true }
-                    }
-                })
+                HomeScreen(
+                    onSignOut = {
+                        onLogout()
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Main.route) { inclusive = true }
+                        }
+                    },
+                    navController = navController // ✅ Pass navController to HomeScreen
+                )
             }
-
 
             composable("schedule") {
-                ScheduleScreen() // ViewModel will be provided automatically by Compose
+                ScheduleScreen()
             }
-
-
 
             composable(Screen.Main.Settings.route) {
                 SettingsScreen(
                     isDarkMode = isDarkMode,
                     onToggleDarkMode = onToggleDarkMode,
-                    onLogoutDone = {
-                        onLogout()
-
-
-                    }
+                    onLogoutDone = { onLogout() }
                 )
+            }
+
+            // ✅ New Chatbot Route
+            composable("chatbot") {
+                ChatbotScreen()
             }
         }
     }

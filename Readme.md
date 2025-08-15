@@ -21,7 +21,7 @@
 ## 🖼️ Screenshots
 
 ### 🏠 Home Screen
-![WhatsApp Image 2025-08-15 at 19 50 53_ec057924](https://github.com/user-attachments/assets/013f57f0-4ee4-4327-bbdd-ba69150e8d9e)
+<img src="https://github.com/user-attachments/assets/013f57f0-4ee4-4327-bbdd-ba69150e8d9e" width="300" />
 
 
 
@@ -29,11 +29,11 @@
 <img src="https://github.com/user-attachments/assets/a912da91-3a34-48d4-8674-0530c0a8ec20" width="300" />
 
 ### 📅 Schedule Screen
-![WhatsApp Image 2025-08-15 at 19 50 53_3a51b9be](https://github.com/user-attachments/assets/3a9ed76e-c3bd-4bd3-a344-157cdf651d00)
+<img src="https://github.com/user-attachments/assets/3a9ed76e-c3bd-4bd3-a344-157cdf651d00" width="300" />
 
 
 ###   ChatBot Screen
-![WhatsApp Image 2025-08-15 at 19 50 53_32238bd0](https://github.com/user-attachments/assets/efc59f42-6c6d-4c61-9e7b-29f20c39f3c9)
+<img src="https://github.com/user-attachments/assets/efc59f42-6c6d-4c61-9e7b-29f20c39f3c9" width="300" />
 
 ---
 

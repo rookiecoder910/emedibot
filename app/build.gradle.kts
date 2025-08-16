@@ -70,7 +70,7 @@ dependencies {
     // Firebase Realtime Database
     implementation("com.google.firebase:firebase-database-ktx:21.0.0")
 // Firebase Auth
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+    implementation("com.google.firebase:firebase-auth-ktx:23.2.1")
 
 // Google Sign-In (for Firebase)
     implementation("com.google.android.gms:play-services-auth:20.7.0")
@@ -82,12 +82,17 @@ dependencies {
 // Coil for Jetpack Compose
     implementation("io.coil-kt:coil-compose:2.4.0")
 
+    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
+//    implementation("com.google.firebase:firebase-functions-ktx")
 
-
+    implementation("com.google.firebase:firebase-ai")
 
     //lotte animation and data store
     implementation("com.airbnb.android:lottie-compose:6.1.0")
     implementation ("androidx.datastore:datastore-preferences:1.1.1")
+
+        // ... other dependencies
+        implementation("com.google.ai.client.generativeai:generativeai:0.6.0") // Check for the latest version
 
     // Testing
     testImplementation(libs.junit)

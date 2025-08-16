@@ -80,16 +80,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import com.google.firebase.database.ValueEventListener
 
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.database
 import scheduleDailyAlarm
 
 
@@ -142,6 +143,7 @@ fun dropdown(){
 fun HomeScreen(onSignOut: () -> Unit,navController: NavHostController) {
     val context = LocalContext.current
     var medicines by remember { mutableStateOf(emptyList<Medicine>()) }
+
 
     LaunchedEffect(Unit) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@LaunchedEffect
@@ -350,12 +352,13 @@ fun HomeScreen(onSignOut: () -> Unit,navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // --- FIX START: Simplified "Add Medicine" logic ---
                     OutlinedButton(
                         onClick = {
                             if (newMedicineName.isNotBlank() && newMedicineTime.isNotBlank()) {
-                                val updated = medicines + Medicine(newMedicineName.trim(), newMedicineTime)
-                                medicines = updated
-                                updateFirebaseMedicineTime(updated)
+
+                                addMedicineToFirebase(Medicine(newMedicineName.trim(), newMedicineTime))
+
                                 val timeParts = newMedicineTime.split(":", " ")
                                 if (timeParts.size >= 3) {
                                     var hour = timeParts[0].toInt()
@@ -378,6 +381,7 @@ fun HomeScreen(onSignOut: () -> Unit,navController: NavHostController) {
                     ) {
                         Text("Add Medicine")
                     }
+
                 }
             }
 
@@ -397,22 +401,35 @@ fun HomeScreen(onSignOut: () -> Unit,navController: NavHostController) {
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                medicines.forEachIndexed { index, medicine ->
+
+                medicines.forEach { medicine ->
                     MedicineScheduleItem(
                         medicine = medicine,
                         onTimeChange = { newTime ->
-                            val updated = medicines.toMutableList()
-                            updated[index] = updated[index].copy(time = newTime)
-                            medicines = updated
-                            updateFirebaseMedicineTime(updated)
+
+                            updateSingleFirebaseMedicineTime(medicine.name, newTime)
+
+                            // Also re-schedule the alarm with the new time
+                            val timeParts = newTime.split(":", " ")
+                            if (timeParts.size >= 3) {
+                                var hour = timeParts[0].toInt()
+                                val minute = timeParts[1].toInt()
+                                val amPm = timeParts[2]
+                                if (amPm.equals("PM", ignoreCase = true) && hour != 12) hour += 12
+                                if (amPm.equals("AM", ignoreCase = true) && hour == 12) hour = 0
+                                scheduleDailyAlarm(context, hour, minute, medicine.name)
+                            }
                         },
                         onDelete = {
-                            deleteMedicine(medicine, medicines) { updatedList ->
-                                medicines = updatedList
+
+                            deleteMedicine(medicine) {
+
+                                medicines = medicines.filter { it.name != medicine.name }
                             }
                         }
                     )
                 }
+
             }
 
 
@@ -448,19 +465,19 @@ fun HomeScreen(onSignOut: () -> Unit,navController: NavHostController) {
     }
 }
 
+
 fun deleteMedicine(
     medicine: Medicine,
-    medicines: List<Medicine>,
-    updateMedicines: (List<Medicine>) -> Unit
+    onSuccess: () -> Unit
 ) {
     val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
     val ref = Firebase.database.getReference("users").child(uid).child("medicines").child(medicine.name.replace(" ", "_"))
 
     ref.removeValue().addOnSuccessListener {
-        val updatedList = medicines.filter { it.name != medicine.name }
-        updateMedicines(updatedList)
+        onSuccess()
     }
 }
+
 
 
 @Composable
@@ -543,22 +560,31 @@ fun DeviceStatusCard() {
     }
 }
 
-fun updateFirebaseMedicineTime(medicines: List<Medicine>) {
+
+fun addMedicineToFirebase(medicine: Medicine) {
     val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
     val ref = Firebase.database.getReference("users").child(uid).child("medicines")
-
-    medicines.forEach { medicine ->
-        val medicineRef = ref.child(medicine.name.replace(" ", "_"))
-        medicineRef.setValue(medicine.time)
-    }
+    ref.child(medicine.name.replace(" ", "_")).setValue(medicine.time)
 }
+
+
+fun updateSingleFirebaseMedicineTime(medicineName: String, newTime: String) {
+    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    val ref = Firebase.database.getReference("users")
+        .child(uid)
+        .child("medicines")
+        .child(medicineName.replace(" ", "_"))
+    ref.setValue(newTime)
+}
+// --- FIX END ---
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onDelete: () -> Unit) {
     var showTimePicker by remember { mutableStateOf(false) }
-    var newTime by remember { mutableStateOf(medicine.time) }
+    // This state is now driven by the 'medicine' prop, which comes from the HomeScreen's state.
+    val currentTime = medicine.time
 
     val context = LocalContext.current
 
@@ -568,14 +594,14 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onD
             context,
             { _, hour, minute ->
                 val formattedTime = formatTime(hour, minute)
-                newTime = formattedTime
+                // The onTimeChange lambda now handles all the update logic.
                 onTimeChange(formattedTime)
+                showTimePicker = false
             },
             calendar.get(Calendar.HOUR_OF_DAY),
             calendar.get(Calendar.MINUTE),
             false
         ).show()
-        showTimePicker = false
     }
 
     ElevatedCard  (
@@ -585,7 +611,7 @@ fun MedicineScheduleItem(medicine: Medicine, onTimeChange: (String) -> Unit, onD
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = medicine.name, style = typography.titleSmall)
-            Text(text = "Time: $newTime", style = typography.bodySmall)
+            Text(text = "Time: $currentTime", style = typography.bodySmall)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -617,4 +643,3 @@ fun formatTime(hour: Int, minute: Int): String {
     val time = LocalTime.of(hour, minute)
     return time.format(formatter)
 }
-

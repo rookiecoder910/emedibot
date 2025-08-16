@@ -6,72 +6,75 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.Ringtone
-import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import kotlin.jvm.java
-private fun playAlarmSound(context: Context) {
-    try {
-        val alarmUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val ringtone: Ringtone = RingtoneManager.getRingtone(context, alarmUri)
-        ringtone.play()
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-}
+
+
 class ReminderReceiver : BroadcastReceiver() {
 
+    companion object {
+        const val MEDICINE_NAME = "MEDICINE_NAME"
+        private const val CHANNEL_ID = "medicine_reminder_channel"
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
-        val medicineName = intent.getStringExtra("MEDICINE_NAME") ?: "your medicine"
+        val medicineName = intent.getStringExtra(MEDICINE_NAME) ?: "your medicine"
+
+
         showNotification(context, medicineName)
-        playAlarmSound(context)
+
+
+        val serviceIntent = Intent(context, RingtonePlayingService::class.java)
+        context.startService(serviceIntent)
     }
 
     private fun showNotification(context: Context, medicineName: String) {
-        val channelId = "medicine_reminder"
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                channelId,
+                CHANNEL_ID,
                 "Medicine Reminders",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Reminders to take medicine"
+                description = "High priority reminders to take medicine"
+                enableVibration(true)
             }
             notificationManager.createNotificationChannel(channel)
         }
+
+
         val cancelIntent = Intent(context, AlarmCancelReceiver::class.java).apply {
-            putExtra("MEDICINE_NAME", medicineName)
+            putExtra(AlarmCancelReceiver.MEDICINE_NAME, medicineName)
         }
+
 
         val cancelPendingIntent = PendingIntent.getBroadcast(
             context,
             medicineName.hashCode(),
             cancelIntent,
+
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("⏰ Time to take your medicine!")
-            .setContentText("💊 Take $medicineName now.")
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // Make sure you have this icon
+            .setContentTitle("⏰ Time for your medicine!")
+            .setContentText("Please take your dose of $medicineName now.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
+            .setOngoing(true)
             .addAction(
-                R.drawable.ic_cancel,
-                "Cancel",
+                R.drawable.ic_cancel, // Make sure you have this icon
+                "Turn Off",
                 cancelPendingIntent
             )
+            .build()
 
-        notificationManager.notify(medicineName.hashCode(), notification.build())
-
-
+        notificationManager.notify(medicineName.hashCode(), notification)
     }
 }

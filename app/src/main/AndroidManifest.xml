@@ -24,7 +24,7 @@
         <receiver android:name=".AlarmReceiver" android:exported="false" />
 
         <receiver android:name=".ReminderReceiver" android:exported="true" />
-
+        <service android:name=".RingtonePlayingService" android:enabled="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

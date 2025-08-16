@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 
 
-// --- Data & View Model (with Mock Logic) ---
+
 
 data class ChatMessage(val text: String, val isUser: Boolean)
 
@@ -37,7 +37,7 @@ class ChatViewModel : ViewModel() {
     val isTyping: StateFlow<Boolean> = _isTyping.asStateFlow()
 
     init {
-        // Add an initial greeting message from the bot
+
         _messages.value = listOf(
             ChatMessage(
                 text = "Hello! I'm EmediBot. I can answer basic questions. How can I help?",
@@ -49,11 +49,11 @@ class ChatViewModel : ViewModel() {
     fun sendMessage(userText: String) {
         if (userText.isBlank()) return
 
-        // Add user message
+
         _messages.value += ChatMessage(userText, true)
         _isTyping.value = true
 
-        // Simulate AI reply with new mock logic
+
         viewModelScope.launch {
             delay(1500) // simulate thinking
             val botResponse = getMockResponse(userText)
@@ -69,27 +69,27 @@ class ChatViewModel : ViewModel() {
         val normalizedText = userText.trim().lowercase()
 
         return when {
-            // Check for greetings
+
             normalizedText in listOf("hi", "hello") -> {
                 "Hi, how can I assist you?"
             }
             normalizedText in listOf("thanks","ok thanks") -> {
                 "It's my pleasure to assist u "
             }
-            // Check for keywords like "fever" and "medicine"
+
             "fever" in normalizedText && ("medicine" in normalizedText || "preferable" in normalizedText) -> {
                 "For fever, common over-the-counter options include Paracetamol or Ibuprofen. " +
                         "However, I am an AI assistant and not a medical professional. " +
                         "It is always best to consult with a doctor or pharmacist for medical advice."
             }
-            // A few other examples
+
             "headache" in normalizedText -> {
                 "For a headache, people often take Aspirin or Paracetamol. Please consult a doctor for persistent issues."
             }
             "how are you" in normalizedText -> {
                 "I'm a bot, so I'm always running at 100%! How can I help you today?"
             }
-            // Default response for anything else
+
             else -> {
                 "I can only respond to a few specific questions right now. Try asking me about medicine for a fever or a headache."
             }
@@ -97,7 +97,7 @@ class ChatViewModel : ViewModel() {
     }
 }
 
-// --- UI Components (with Improved UI) ---
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +107,7 @@ fun ChatbotScreen(viewModel: ChatViewModel = androidx.lifecycle.viewmodel.compos
     var userInput by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
-    // Coroutine to scroll to the bottom when a new message arrives
+
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
@@ -149,7 +149,7 @@ fun ChatbotScreen(viewModel: ChatViewModel = androidx.lifecycle.viewmodel.compos
                 }
             }
 
-            // Input Field Area
+
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shadowElevation = 8.dp

@@ -152,7 +152,7 @@ fun ChatbotScreen(viewModel: ChatViewModel = androidx.lifecycle.viewmodel.compos
 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shadowElevation = 8.dp
+                shadowElevation = 0.dp
             ) {
                 Row(
                     modifier = Modifier

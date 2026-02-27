@@ -18,7 +18,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -98,13 +97,6 @@ fun LoginScreen(
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-            Image(
-                painter = painterResource(id = R.drawable.bg),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -116,8 +108,7 @@ fun LoginScreen(
                     painter = painterResource(id = R.drawable.emedibot),
                     contentDescription = "App Logo",
                     modifier = Modifier
-                        .size(120.dp)
-                        .shadow(8.dp, shape = RoundedCornerShape(24.dp))
+                        .size(100.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -215,9 +206,7 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary
-                    )
+                    colors = ButtonDefaults.filledTonalButtonColors()
                 ) {
                     Icon(
                         imageVector = Icons.Default.AccountCircle,

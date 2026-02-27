@@ -7,7 +7,6 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,10 +24,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -50,9 +46,6 @@ import java.util.Calendar
 
 data class Medicine(val name: String, var time: String)
 
-// Enhanced Color Palette
-
-val LightBlue = Color(0xFF4A90E2)
 val SoftGreen = Color(0xFF4CAF50)
 val SoftRed = Color(0xFFFF5252)
 
@@ -61,103 +54,37 @@ fun ImprovedDropdown() {
     var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.padding(4.dp)) {
-        IconButton(
-            onClick = { expanded = !expanded },
-            modifier = Modifier
-                .size(48.dp)
-                .background(
-                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                    CircleShape
-                )
-        ) {
+        IconButton(onClick = { expanded = !expanded }) {
             Icon(
                 Icons.Default.Menu,
                 contentDescription = "Menu",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .width(220.dp)
+            modifier = Modifier.width(200.dp)
         ) {
             DropdownMenuItem(
-                text = {
-                    Text(
-                        "Profile",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Person,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                },
+                text = { Text("Profile") },
+                leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
                 onClick = { expanded = false }
             )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
             DropdownMenuItem(
-                text = {
-                    Text(
-                        "Settings",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Settings,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                },
+                text = { Text("Settings") },
+                leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
                 onClick = { expanded = false }
             )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
             DropdownMenuItem(
-                text = {
-                    Text(
-                        "Notifications",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Notifications,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                },
+                text = { Text("Notifications") },
+                leadingIcon = { Icon(Icons.Outlined.Notifications, contentDescription = null) },
                 onClick = { expanded = false }
             )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
             DropdownMenuItem(
-                text = {
-                    Text(
-                        "About us",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Info,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                },
+                text = { Text("About us") },
+                leadingIcon = { Icon(Icons.Outlined.Info, contentDescription = null) },
                 onClick = { expanded = false }
             )
         }
@@ -211,15 +138,7 @@ fun HomeScreen(onSignOut: () -> Unit, navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f),
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.background
-                    )
-                )
-            )
+            .background(MaterialTheme.colorScheme.background)
     ) {
         val scrollState = rememberScrollState()
 
@@ -228,56 +147,39 @@ fun HomeScreen(onSignOut: () -> Unit, navController: NavHostController) {
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Enhanced Header
+            // Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp),
+                    .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
+                    Image(
+                        painter = painterResource(id = R.drawable.emedibot),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(64.dp)
-                            .shadow(8.dp, CircleShape)
-                            .background(
-                                Brush.linearGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
-                                    )
-                                ),
-                                CircleShape
-                            )
-                            .padding(4.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.emedibot),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                        )
-                    }
+                            .size(44.dp)
+                            .clip(CircleShape)
+                    )
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
                     Column {
                         Text(
                             text = "Emedibot",
-                            style = MaterialTheme.typography.headlineSmall.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = MaterialTheme.colorScheme.onBackground
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.SemiBold
+                            )
                         )
                         Text(
                             text = "Your Health Companion",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                     }
                 }
@@ -285,291 +187,156 @@ fun HomeScreen(onSignOut: () -> Unit, navController: NavHostController) {
                 ImprovedDropdown()
             }
 
-            // Enhanced Upcoming Dose Card
+            // Upcoming Dose
             nextMedicine?.let {
-                var isUpcomingExpanded by remember { mutableStateOf(true) }
-                val rotation by animateFloatAsState(
-                    targetValue = if (isUpcomingExpanded) 180f else 0f,
-                    animationSpec = tween(durationMillis = 300)
-                )
-
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(12.dp, RoundedCornerShape(24.dp)),
+                    modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     ),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { isUpcomingExpanded = !isUpcomingExpanded },
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .background(
-                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                            CircleShape
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.Notifications,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text(
-                                    "Upcoming Dose",
-                                    style = MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            }
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            "Upcoming Dose",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        )
 
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = it.name,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                Icons.Default.KeyboardArrowDown,
-                                contentDescription = "Toggle",
-                                modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                                Icons.Outlined.Schedule,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = it.time,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
                         }
 
-                        AnimatedVisibility(
-                            visible = isUpcomingExpanded,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        FilledTonalButton(
+                            onClick = {
+                                Toast.makeText(
+                                    context,
+                                    "Viewing Instructions for ${it.name}...",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp)
                         ) {
-                            Column(modifier = Modifier.padding(top = 16.dp)) {
-                                Surface(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
-                                    shape = RoundedCornerShape(16.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(16.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = it.name,
-                                                style = MaterialTheme.typography.headlineSmall.copy(
-                                                    fontWeight = FontWeight.SemiBold
-                                                )
-                                            )
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(
-                                                    Icons.Outlined.Schedule,
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(18.dp),
-                                                    tint = MaterialTheme.colorScheme.onSurface.copy(
-                                                        alpha = 0.6f
-                                                    )
-                                                )
-                                                Spacer(modifier = Modifier.width(6.dp))
-                                                Text(
-                                                    text = it.time,
-                                                    style = MaterialTheme.typography.titleMedium,
-                                                    color = MaterialTheme.colorScheme.onSurface.copy(
-                                                        alpha = 0.8f
-                                                    )
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                Button(
-                                    onClick = {
-                                        Toast.makeText(
-                                            context,
-                                            "Viewing Instructions for ${it.name}...",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary
-                                    ),
-                                    shape = RoundedCornerShape(14.dp),
-                                    contentPadding = PaddingValues(vertical = 14.dp)
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.Info,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        "View Instructions",
-                                        style = MaterialTheme.typography.bodyLarge.copy(
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                    )
-                                }
-                            }
+                            Icon(
+                                Icons.Outlined.Info,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("View Instructions")
                         }
                     }
                 }
             }
 
-            // Device Status Card
+            // Device Status
             ImprovedDeviceStatusCard()
 
-            // Enhanced Order Button
-            Button(
+            // Order Button
+            OutlinedButton(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW, "https://www.pharmeasy.in".toUri())
                     context.startActivity(intent)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Red
-                ),
-                shape = RoundedCornerShape(16.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp)
+                    .height(48.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Icon(
                     Icons.Outlined.ShoppingCart,
                     contentDescription = null,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(18.dp)
                 )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    "Order New Medicines",
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Order New Medicines")
             }
 
-            // Enhanced Add Medicine Card
+            // Add Medicine
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(8.dp, RoundedCornerShape(24.dp)),
+                modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                    CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Outlined.Add,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            text = "Add New Medicine",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            )
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Add New Medicine",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.SemiBold
                         )
-                    }
+                    )
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     OutlinedTextField(
                         value = newMedicineName,
                         onValueChange = { newMedicineName = it },
                         label = { Text("Medicine Name") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(
-                                Icons.Outlined.MedicalServices,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                        )
+                        shape = RoundedCornerShape(8.dp),
+                        singleLine = true
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     OutlinedCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showTimePicker = true },
-                        shape = RoundedCornerShape(14.dp),
-                        border = CardDefaults.outlinedCardBorder().copy(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                                    MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                                )
-                            )
-                        )
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(18.dp),
+                                .padding(14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    Icons.Outlined.Schedule,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
+                            Column {
+                                Text(
+                                    text = "Schedule Time",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                                 )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column {
-                                    Text(
-                                        text = "Schedule Time",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                    )
-                                    Text(
-                                        text = if (newMedicineTime.isBlank()) "Not Set" else newMedicineTime,
-                                        style = MaterialTheme.typography.bodyLarge.copy(
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                    )
-                                }
+                                Text(
+                                    text = if (newMedicineTime.isBlank()) "Not Set" else newMedicineTime,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
                             }
                             Icon(
-                                Icons.Default.Edit,
+                                Icons.Outlined.Schedule,
                                 contentDescription = null,
                                 modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Button(
                         onClick = {
@@ -610,70 +377,36 @@ fun HomeScreen(onSignOut: () -> Unit, navController: NavHostController) {
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
+                            .height(48.dp),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Add Medicine",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
+                        Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Add Medicine")
                     }
                 }
             }
 
-            // Today's Schedule Section
+            // Today's Schedule
             if (medicines.isNotEmpty()) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                    ),
-                    shape = RoundedCornerShape(20.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Outlined.CalendarToday,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                                modifier = Modifier.size(28.dp)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = "Today's Schedule",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = MaterialTheme.colorScheme.onTertiaryContainer
-                            )
-                        }
-                        Surface(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = CircleShape,
-                            shadowElevation = 2.dp
-                        ) {
-                            Text(
-                                text = "${medicines.size}",
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
+                    Text(
+                        text = "Today's Schedule",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    )
+                    Text(
+                        text = "${medicines.size} medications",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                    )
                 }
 
                 // Medicine List
@@ -712,26 +445,20 @@ fun HomeScreen(onSignOut: () -> Unit, navController: NavHostController) {
             Spacer(modifier = Modifier.height(80.dp))
         }
 
-        // Enhanced Floating Action Button
+        // Chat FAB
         FloatingActionButton(
             onClick = { navController.navigate("chatbot") },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(24.dp)
-                .size(68.dp)
-                .shadow(12.dp, CircleShape),
+                .padding(20.dp),
             shape = CircleShape,
-            containerColor = MaterialTheme.colorScheme.primary,
-            elevation = FloatingActionButtonDefaults.elevation(
-                defaultElevation = 8.dp,
-                pressedElevation = 12.dp
-            )
+            containerColor = MaterialTheme.colorScheme.primary
         ) {
             Icon(
                 painter = painterResource(R.drawable.gemii),
                 contentDescription = "Gemini Chat",
                 tint = Color.Unspecified,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(24.dp)
             )
         }
     }
@@ -739,12 +466,10 @@ fun HomeScreen(onSignOut: () -> Unit, navController: NavHostController) {
 
 @Composable
 fun ImprovedDeviceStatusCard() {
-    val context = LocalContext.current
     val database = Firebase.database
 
     var dispenserStatus by remember { mutableStateOf("Not connected") }
     var batteryLevel by remember { mutableStateOf("N/A") }
-    var isExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         val statusRef = database.getReference("device_status")
@@ -773,162 +498,58 @@ fun ImprovedDeviceStatusCard() {
 
     val isConnected = dispenserStatus == "Connected"
     val statusColor = if (isConnected) SoftGreen else SoftRed
-    val rotation by animateFloatAsState(
-        targetValue = if (isExpanded) 180f else 0f,
-        animationSpec = tween(300)
-    )
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(8.dp, RoundedCornerShape(20.dp)),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                "Device Status",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { isExpanded = !isExpanded },
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Text("Dispenser", style = MaterialTheme.typography.bodyMedium)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(44.dp)
-                            .background(statusColor.copy(alpha = 0.2f), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Outlined.PhoneAndroid,
-                            contentDescription = null,
-                            tint = statusColor,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column {
-                        Text(
-                            "Device Status",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                        if (!isExpanded) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .background(statusColor, CircleShape)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    dispenserStatus,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = statusColor,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-                    }
+                            .size(8.dp)
+                            .background(statusColor, CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        dispenserStatus,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = statusColor
+                    )
                 }
-
-                Icon(
-                    Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Toggle",
-                    modifier = Modifier.graphicsLayer(rotationZ = rotation)
-                )
             }
 
-            AnimatedVisibility(
-                visible = isExpanded,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.padding(top = 16.dp)) {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                    )
-
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                "Dispenser:",
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(10.dp)
-                                        .background(statusColor, CircleShape)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    dispenserStatus,
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontWeight = FontWeight.Bold
-                                    ),
-                                    color = statusColor
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                "Battery:",
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    Icons.Outlined.BatteryChargingFull,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
-                                    tint = if (batteryLevel != "N/A") SoftGreen else Color.Gray
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    if (batteryLevel != "N/A") "$batteryLevel%" else batteryLevel,
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontWeight = FontWeight.Bold
-                                    ),
-                                    color = if (batteryLevel != "N/A") SoftGreen else Color.Gray
-                                )
-                            }
-                        }
-                    }
-                }
+                Text("Battery", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    if (batteryLevel != "N/A") "$batteryLevel%" else batteryLevel,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (batteryLevel != "N/A") SoftGreen else Color.Gray
+                )
             }
         }
     }
@@ -960,76 +581,47 @@ fun MedicineScheduleItem(
     }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(4.dp, RoundedCornerShape(18.dp)),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp),
+                .padding(14.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = medicine.name,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    )
+                    style = MaterialTheme.typography.titleMedium
                 )
-                Spacer(modifier = Modifier.height(6.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Outlined.Schedule,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = medicine.time,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                }
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = medicine.time,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                IconButton(
-                    onClick = { showTimePicker = true },
-                    modifier = Modifier
-                        .size(44.dp)
-                        .background(
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                            CircleShape
-                        )
-                ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                IconButton(onClick = { showTimePicker = true }) {
                     Icon(
                         Icons.Default.Edit,
                         contentDescription = "Edit Time",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         modifier = Modifier.size(20.dp)
                     )
                 }
 
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier
-                        .size(44.dp)
-                        .background(
-                            Color(0xFFFFEBEE),
-                            CircleShape
-                        )
-                ) {
+                IconButton(onClick = onDelete) {
                     Icon(
                         Icons.Default.Delete,
                         contentDescription = "Delete",
-                        tint = Color(0xFFD32F2F),
+                        tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(20.dp)
                     )
                 }

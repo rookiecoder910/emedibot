@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Notification permission (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Exact alarm permissions -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
+    <!-- Network -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
- <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Required to restart alarms after phone reboot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Required to run a foreground service (for alarm sound) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:allowBackup="true"
@@ -16,30 +27,53 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Emedibotsimpleuserlogin"
         tools:targetApi="31">
-        <receiver android:name=".AlarmCancelReceiver" />
 
+        <!-- Cancel alarm action receiver -->
+        <receiver
+            android:name=".AlarmCancelReceiver"
+            android:exported="false" />
 
-        <receiver android:name=".AlarmReceiver" android:exported="false" />
+        <!-- Empty stub receiver (kept for manifest consistency) -->
+        <receiver
+            android:name=".AlarmReceiver"
+            android:exported="false" />
 
-        <receiver android:name=".ReminderReceiver" android:exported="true" />
-        <service android:name=".RingtonePlayingService" android:enabled="true" />
+        <!-- Main alarm receiver — fires when medicine time is reached -->
+        <receiver
+            android:name=".ReminderReceiver"
+            android:exported="true" />
+
+        <!-- Boot receiver — re-schedules all alarms after phone reboot -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Foreground service for playing alarm ringtone -->
+        <service
+            android:name=".RingtonePlayingService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
-
             android:theme="@style/Theme.Emedibotsimpleuserlogin">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

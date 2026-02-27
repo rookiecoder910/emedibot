@@ -15,11 +15,6 @@ fun MainScreenWithBottomNav(
     onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
-    val medicines = listOf(
-        Medicine("Tablet A", "8:00 AM"),
-        Medicine("Tablet B", "12:00 PM"),
-        Medicine("Tablet C", "6:00 PM")
-    )
 
     Scaffold(
         bottomBar = {
@@ -33,13 +28,8 @@ fun MainScreenWithBottomNav(
         ) {
             composable(Screen.Main.Home.route) {
                 HomeScreen(
-                    onSignOut = {
-                        onLogout()
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Main.route) { inclusive = true }
-                        }
-                    },
-                    navController = navController // ✅ Pass navController to HomeScreen
+                    onSignOut = { onLogout() },
+                    navController = navController
                 )
             }
 
@@ -55,7 +45,6 @@ fun MainScreenWithBottomNav(
                 )
             }
 
-            // ✅ New Chatbot Route
             composable("chatbot") {
                 ChatbotScreen()
             }

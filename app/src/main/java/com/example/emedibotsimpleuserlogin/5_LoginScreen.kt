@@ -46,8 +46,6 @@ fun LoginScreen(
     val viewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(authRepository = AuthRepository())
     )
-    FirebaseAuth.getInstance().signOut()
-
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val state by viewModel.state.collectAsState()
